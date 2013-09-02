@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smd-tool", "smd-tool\smd-tool.csproj", "{048D823A-BDB6-47B3-BAC3-AF73D81850DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mbn-tool", "mbn-tool\mbn-tool.csproj", "{ADF48A12-8D15-41FF-8856-F4FF6CC19ADC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +15,10 @@ Global
 		{048D823A-BDB6-47B3-BAC3-AF73D81850DC}.Debug|x86.Build.0 = Debug|x86
 		{048D823A-BDB6-47B3-BAC3-AF73D81850DC}.Release|x86.ActiveCfg = Release|x86
 		{048D823A-BDB6-47B3-BAC3-AF73D81850DC}.Release|x86.Build.0 = Release|x86
+		{ADF48A12-8D15-41FF-8856-F4FF6CC19ADC}.Debug|x86.ActiveCfg = Debug|x86
+		{ADF48A12-8D15-41FF-8856-F4FF6CC19ADC}.Debug|x86.Build.0 = Debug|x86
+		{ADF48A12-8D15-41FF-8856-F4FF6CC19ADC}.Release|x86.ActiveCfg = Release|x86
+		{ADF48A12-8D15-41FF-8856-F4FF6CC19ADC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
