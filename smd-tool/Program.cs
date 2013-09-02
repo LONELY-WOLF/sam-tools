@@ -38,7 +38,7 @@ namespace smd_tool
                                     FileStream smd = File.OpenRead(args[1]);
                                     byte[] buffer = new byte[0x800];
                                     smd.Read(buffer, 0, 0x800);
-                                    File.WriteAllBytes(Path.Combine(dir, "\\header.bin"), buffer);
+                                    File.WriteAllBytes(Path.Combine(dir, "header.bin"), buffer);
                                     SMDPart part = new SMDPart();
                                     int offset = 0x200;
                                     Console.ForegroundColor = ConsoleColor.White;
