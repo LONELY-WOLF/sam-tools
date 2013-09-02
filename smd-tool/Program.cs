@@ -164,6 +164,8 @@ smd-tool /h <file>
     Parse header in <file> and display info
 
 Default <path> is current directory
+
+(c) -WOLF- 2013
 ");
         }
 
