@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{ADF48A12-8D15-41FF-8856-F4FF6CC19ADC}</ProjectGuid>
+    <ProjectGuid>{3EBFD069-8DF7-4CE6-8065-43968AD04D18}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>mbn_tool</RootNamespace>
-    <AssemblyName>mbn-tool</AssemblyName>
+    <RootNamespace>image_rebase</RootNamespace>
+    <AssemblyName>image-rebase</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

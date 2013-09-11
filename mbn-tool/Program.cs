@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using FileLib;
 
 namespace mbn_tool
 {
@@ -41,9 +42,9 @@ namespace mbn_tool
                                 BinaryReader reader = new BinaryReader(mbnFile, Encoding.ASCII);
                                 //Header
                                 FileStream output = new FileStream(Path.Combine(folder, "mbn_header.bin"), FileMode.Create);
-                                start = FileSearch(mbnFile, oSign, 0);
-                                end = FileSearch(mbnFile, cSign, start) + 4;
-                                StreamCopy(mbnFile, output, start, end - start);
+                                start = FileIO.FileSearch(mbnFile, oSign, 0);
+                                end = FileIO.FileSearch(mbnFile, cSign, start) + 4;
+                                FileIO.StreamCopy(mbnFile, output, start, end - start);
                                 output.Close();
                                 mbnFile.Position = start + 4;
                                 sectionsCount = reader.ReadUInt32();
@@ -56,15 +57,15 @@ namespace mbn_tool
                                 //Sections
                                 for (int i = 0; i < sectionsCount; i++)
                                 {
-                                    start = FileSearch(mbnFile, oSign, end);
-                                    end = FileSearch(mbnFile, cSign, start) + 4;
+                                    start = FileIO.FileSearch(mbnFile, oSign, end);
+                                    end = FileIO.FileSearch(mbnFile, cSign, start) + 4;
                                     mbnFile.Position = start + 4;
                                     filesCount = reader.ReadUInt32();
                                     sectionName = Encoding.ASCII.GetString(reader.ReadBytes(0x3));
                                     Console.WriteLine("Section name: " + sectionName);
                                     Console.WriteLine("Files count: " + filesCount.ToString());
                                     output = new FileStream(folder + sectionName + "_header.bin", FileMode.Create);
-                                    StreamCopy(mbnFile, output, start, end - start);
+                                    FileIO.StreamCopy(mbnFile, output, start, end - start);
                                     output.Close();
                                     //Files
                                     Directory.CreateDirectory(Path.Combine(folder, sectionName));
@@ -77,7 +78,7 @@ namespace mbn_tool
                                         mbnFile.Position += 0x08;
                                         fileName = Encoding.ASCII.GetString(reader.ReadBytes(0x40).TakeWhile(x => x != 0x00).ToArray());
                                         output = new FileStream(Path.Combine(folder, sectionName, fileName), FileMode.Create);
-                                        StreamCopy(mbnFile, output, curFilePointer, fileLength);
+                                        FileIO.StreamCopy(mbnFile, output, curFilePointer, fileLength);
                                         output.Close();
                                         curFilePointer += fileLength;
                                         fileRecordOffset += 0x50;
@@ -111,8 +112,8 @@ namespace mbn_tool
                                 FileStream mbnFile = new FileStream(args[1], FileMode.Open);
                                 BinaryReader reader = new BinaryReader(mbnFile, Encoding.ASCII);
                                 //Header
-                                start = FileSearch(mbnFile, oSign, 0);
-                                end = FileSearch(mbnFile, cSign, start) + 4;
+                                start = FileIO.FileSearch(mbnFile, oSign, 0);
+                                end = FileIO.FileSearch(mbnFile, cSign, start) + 4;
                                 mbnFile.Position = start + 4;
                                 sectionsCount = reader.ReadUInt32();
                                 mbnFile.Position = start + 0x20;
@@ -124,8 +125,8 @@ namespace mbn_tool
                                 //Sections
                                 for (int i = 0; i < sectionsCount; i++)
                                 {
-                                    start = FileSearch(mbnFile, oSign, end);
-                                    end = FileSearch(mbnFile, cSign, start) + 4;
+                                    start = FileIO.FileSearch(mbnFile, oSign, end);
+                                    end = FileIO.FileSearch(mbnFile, cSign, start) + 4;
                                     mbnFile.Position = start + 4;
                                     filesCount = reader.ReadUInt32();
                                     sectionName = Encoding.ASCII.GetString(reader.ReadBytes(0x3));
@@ -175,39 +176,6 @@ Default <path> is current directory
 
 (c) -WOLF- 2013
 ");
-            }
-        }
-
-        static long FileSearch(FileStream source, byte[] data, long startPos)
-        {
-            int c, i = 0;
-            source.Position = startPos;
-            while ((c = source.ReadByte()) != -1)
-            {
-                if (data[i] == (byte)c)
-                {
-                    i++;
-                    if (i == data.Length)
-                    {
-                        return source.Position - i;
-                    }
-                }
-            }
-            return -1;
-        }
-
-        static void StreamCopy(Stream source, Stream dest, long start, long count, int bufferSize = 4096)
-        {
-            long counter = 0;
-            int bytesRead, bytesToRead;
-            byte[] buffer = new byte[bufferSize];
-            source.Seek(start, SeekOrigin.Begin);
-            while (counter < count)
-            {
-                bytesToRead = (int)((count - counter > bufferSize) ? bufferSize : count - counter);
-                bytesRead = source.Read(buffer, 0, bytesToRead);
-                dest.Write(buffer, 0, bytesRead);
-                counter += bytesRead;
             }
         }
 
