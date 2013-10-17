@@ -64,7 +64,7 @@ namespace mbn_tool
                                     sectionName = Encoding.ASCII.GetString(reader.ReadBytes(0x3));
                                     Console.WriteLine("Section name: " + sectionName);
                                     Console.WriteLine("Files count: " + filesCount.ToString());
-                                    output = new FileStream(folder + sectionName + "_header.bin", FileMode.Create);
+                                    output = new FileStream(Path.Combine(folder, sectionName + "_header.bin"), FileMode.Create);
                                     FileIO.StreamCopy(mbnFile, output, start, end - start);
                                     output.Close();
                                     //Files
@@ -90,7 +90,102 @@ namespace mbn_tool
                             }
                         case "/p":
                             {
-                                PrintError("Packing isn't implemented yet");
+                                if (Directory.Exists(args[1]))
+                                {
+                                    string filename;
+                                    if (args.Count() > 2)
+                                    {
+                                        filename = args[2];
+                                    }
+                                    else
+                                    {
+                                        filename = Path.GetFileName(args[1]) + ".mbn";
+                                    }
+                                    int recordOffset, dataOffset, filesCount, i, sum;
+                                    FileStream mbnFile = new FileStream(filename, FileMode.Create);
+                                    FileStream inputFile;
+                                    BinaryWriter writer = new BinaryWriter(mbnFile, Encoding.ASCII);
+                                    writer.Write(0x5955C5C1);
+                                    writer.Write(Directory.GetDirectories(args[1]).Count());
+                                    FileIO.WriteZeroes(mbnFile, 8, 0x34, 0x34);
+                                    writer.Write(0x5955C5C2);
+                                    mbnFile.Position = 0x20;
+                                    writer.Write(Encoding.ASCII.GetBytes("I8750OXABME1"));
+                                    mbnFile.Position = 0x30;
+                                    writer.Write(Encoding.ASCII.GetBytes("OXA"));
+                                    mbnFile.Position = 0x40;
+                                    foreach (string cscDir in Directory.GetDirectories(args[1]))
+                                    {
+                                        if (Path.GetFileName(cscDir).Length == 3)
+                                        {
+                                            Console.WriteLine("\r\nPacking: " + Path.GetFileName(cscDir));
+                                            writer.Write(0x5955C5C1);
+                                            recordOffset = (int)mbnFile.Position;
+                                            FileIO.WriteZeroes(mbnFile, mbnFile.Position, 0x298, 0x298);
+                                            writer.Write(0x5955C5C2);
+                                            dataOffset = (int)mbnFile.Position;
+                                            mbnFile.Position = recordOffset;
+                                            filesCount = Directory.GetFiles(cscDir).Count();
+                                            writer.Write(filesCount);
+                                            writer.Write(Encoding.ASCII.GetBytes(Path.GetFileName(cscDir)));
+                                            mbnFile.Position += 17;
+                                            i = 1;
+                                            foreach (string file in Directory.GetFiles(cscDir))
+                                            {
+                                                inputFile = new FileStream(file, FileMode.Open);
+                                                switch (Path.GetExtension(file))
+                                                {
+                                                    case ".ini":
+                                                    case ".reg":
+                                                        {
+                                                            writer.Write(0x0B);
+                                                            break;
+                                                        }
+                                                    case ".provxml":
+                                                        {
+                                                            writer.Write(0x1A);
+                                                            break;
+                                                        }
+                                                    case ".xml":
+                                                        {
+                                                            writer.Write(0x0F);
+                                                            break;
+                                                        }
+                                                    default:
+                                                        {
+                                                            writer.Write(0x00);
+                                                            break;
+                                                        }
+                                                }
+                                                Console.Write("{0,-69}{1,11}", file, FileIO.FileSizeToString(inputFile.Length));
+                                                writer.Write((int)inputFile.Length);
+                                                recordOffset = (int)mbnFile.Position;
+                                                mbnFile.Position = dataOffset;
+                                                FileIO.StreamCopy(inputFile, mbnFile, 0, inputFile.Length, out sum);
+                                                dataOffset = (int)mbnFile.Position;
+                                                mbnFile.Position = recordOffset;
+                                                writer.Write(sum);
+                                                writer.Write(i);
+                                                recordOffset = (int)mbnFile.Position;
+                                                writer.Write(Encoding.ASCII.GetBytes(Path.GetFileName(file)));
+                                                mbnFile.Position = (recordOffset + 0x40);
+                                                if (i != filesCount - 1)
+                                                {
+                                                    i++;
+                                                }
+                                                else
+                                                {
+                                                    i = 0;
+                                                }
+                                            }
+                                            mbnFile.Position = dataOffset;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    PrintError("No such directory");
+                                }
                                 break;
                             }
                         case "/h":
@@ -166,7 +261,7 @@ USAGE:
 smd-tool /u <file> [<path>]
     Unpack MBN file
 
-smd-tool /p <file> [<path>]
+smd-tool /p <path> [<file>]
     Pack files located at <path> into MBN file <file>
 
 smd-tool /h <file>
