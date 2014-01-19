@@ -41,11 +41,11 @@ namespace mbn_tool
                                 FileStream mbnFile = new FileStream(args[1], FileMode.Open);
                                 BinaryReader reader = new BinaryReader(mbnFile, Encoding.ASCII);
                                 //Header
-                                FileStream output = new FileStream(Path.Combine(folder, "mbn_header.bin"), FileMode.Create);
+                                FileStream output; //= new FileStream(Path.Combine(folder, "mbn_header.bin"), FileMode.Create);
                                 start = FileIO.FileSearch(mbnFile, oSign, 0);
                                 end = FileIO.FileSearch(mbnFile, cSign, start) + 4;
-                                FileIO.StreamCopy(mbnFile, output, start, end - start);
-                                output.Close();
+                                //FileIO.StreamCopy(mbnFile, output, start, end - start);
+                                //output.Close();
                                 mbnFile.Position = start + 4;
                                 sectionsCount = reader.ReadUInt32();
                                 mbnFile.Position = start + 0x20;
@@ -64,9 +64,9 @@ namespace mbn_tool
                                     sectionName = Encoding.ASCII.GetString(reader.ReadBytes(0x3));
                                     Console.WriteLine("Section name: " + sectionName);
                                     Console.WriteLine("Files count: " + filesCount.ToString());
-                                    output = new FileStream(Path.Combine(folder, sectionName + "_header.bin"), FileMode.Create);
-                                    FileIO.StreamCopy(mbnFile, output, start, end - start);
-                                    output.Close();
+                                    //output = new FileStream(Path.Combine(folder, sectionName + "_header.bin"), FileMode.Create);
+                                    //FileIO.StreamCopy(mbnFile, output, start, end - start);
+                                    //output.Close();
                                     //Files
                                     Directory.CreateDirectory(Path.Combine(folder, sectionName));
                                     fileRecordOffset = start + 0x20;
@@ -228,7 +228,6 @@ namespace mbn_tool
                                     Console.WriteLine("Section name: " + sectionName);
                                     Console.WriteLine("Files count: " + filesCount.ToString());
                                     //Files
-                                    Directory.CreateDirectory(Path.Combine(folder, sectionName));
                                     fileRecordOffset = start + 0x20;
                                     curFilePointer = end;
                                     for (int f = 0; f < filesCount; f++)
