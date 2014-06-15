@@ -110,9 +110,9 @@ namespace mbn_tool
                                     FileIO.WriteZeroes(mbnFile, 8, 0x34, 0x34);
                                     writer.Write(0x5955C5C2);
                                     mbnFile.Position = 0x20;
-                                    writer.Write(Encoding.ASCII.GetBytes("I8750OXABME1"));
+                                    writer.Write(Encoding.ASCII.GetBytes("I8750OXXCMK2"));
                                     mbnFile.Position = 0x30;
-                                    writer.Write(Encoding.ASCII.GetBytes("OXA"));
+                                    writer.Write(Encoding.ASCII.GetBytes("OXX"));
                                     mbnFile.Position = 0x40;
                                     foreach (string cscDir in Directory.GetDirectories(args[1]))
                                     {
