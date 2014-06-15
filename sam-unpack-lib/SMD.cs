@@ -8,7 +8,7 @@ namespace sam_unpack_lib
 {
     public static class SMD
     {
-        public struct Section
+        public class Section
         {
             public string Name;
             public uint FileOffset, FileLength, ROMOffset, ROMLength, ID, FS, IsPresentSignature;
@@ -34,9 +34,42 @@ namespace sam_unpack_lib
                             "\nAttributes: 0x" + FS.ToString("X8");
                 }
             }
+
+            public bool Extract(string fileName, string path)
+            {
+                if ((this.IsPresentSignature == 0x1F1F1F1F) & (this.FileOffset != 0) & (this.FileLength != 0))
+                {
+                    FileStream smd = new FileStream(fileName, FileMode.Open);
+                    FileStream outFile = File.Open(Path.Combine(path, this.Name + ".bin"), FileMode.Create);
+                    byte[] buffer = new byte[1024 * 1024];
+                    smd.Position = this.FileOffset;
+                    long count;
+                    while (true)
+                    {
+                        count = (long)(this.FileOffset + this.FileLength - smd.Position);
+                        if (count == 0)
+                        {
+                            break;
+                        }
+                        if (count > buffer.Length) count = buffer.Length;
+                        int read = smd.Read(buffer, 0, (int)count);
+                        if (read <= 0)
+                        {
+                            break;
+                        }
+                        outFile.Write(buffer, 0, read);
+                    }
+                    outFile.Close();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
-        public static List<Section> GetSections(string fileName, bool onlyAvaible)
+        public static List<Section> GetSections(string fileName, bool onlyAvaible = false)
         {
             FileStream smd = File.OpenRead(fileName);
             List<Section> sections = new List<Section>();
@@ -76,30 +109,7 @@ namespace sam_unpack_lib
         {
             foreach (Section part in sections)
             {
-                if ((part.IsPresentSignature == 0x1F1F1F1F) & (part.FileOffset != 0) & (part.FileLength != 0))
-                {
-                    FileStream smd = new FileStream(fileName, FileMode.Open);
-                    FileStream outFile = File.Open(Path.Combine(path, part.Name + ".bin"), FileMode.Create);
-                    byte[] buffer = new byte[1024 * 1024];
-                    smd.Position = part.FileOffset;
-                    int count;
-                    while (true)
-                    {
-                        count = (int)(part.FileOffset + part.FileLength - smd.Position);
-                        if (count == 0)
-                        {
-                            break;
-                        }
-                        if (count > buffer.Length) count = buffer.Length;
-                        int read = smd.Read(buffer, 0, count);
-                        if (read <= 0)
-                        {
-                            break;
-                        }
-                        outFile.Write(buffer, 0, read);
-                    }
-                    outFile.Close();
-                }
+                part.Extract(fileName, path);
             }
         }
 
