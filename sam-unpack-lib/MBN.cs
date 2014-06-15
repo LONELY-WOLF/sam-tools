@@ -7,44 +7,56 @@ using System.IO;
 
 namespace sam_unpack_lib
 {
-    class MBN
+    public class MBN
     {
         public string Version, SubVersion;
-        static const UInt32 StartMark = 0x5955C5C1, EndMark = 0x5955C5C2;
+        const UInt32 StartMark = 0x5955C5C1, EndMark = 0x5955C5C2;
         BinaryReader br;
         BinaryWriter bw;
         FileStream mbnFile;
+        public List<Section> Sections = new List<Section>();
 
         static byte[] oSign = new byte[4] { 0xC1, 0xC5, 0x55, 0x59 }, cSign = new byte[4] { 0xC2, 0xC5, 0x55, 0x59 };
+        
+
+        public struct File
+        {
+            public string Name;
+            public UInt32 Offset, Length, Checksum;
+        }
 
         public struct Section
         {
             public string Name;
             public UInt32 Offset, Length;
             public File[] Files;
-        }
 
-        public struct File
-        {
-            public string Name;
-            public UInt32 Offset, Length, Checksum;
-
-            public File()
+            public string FName
             {
-                Name = "";
-                Offset = 0;
-                Length = 0;
-                Checksum = 0;
+                get
+                {
+                    return Name;
+                }
+            }
+
+            public string FInfo
+            {
+                get
+                {
+                    string RetVal = "Files:\r\n";
+                    foreach (MBN.File file in Files)
+                    {
+                        RetVal += file.Name + "\r\n";
+                    }
+                    return RetVal;
+                }
             }
         }
-
-        public List<Section> Sections = new List<Section>();
 
         public void Load(string fileName)
         {
             Section section;
-            string sectionName;
-            UInt32 sectionsCount, filesCount, fileLength;
+            UInt32 sectionsCount, filesCount;
             long start, end, fileRecordOffset, curFilePointer;
             mbnFile = System.IO.File.Open(fileName, FileMode.Open, FileAccess.Read);
             br = new BinaryReader(mbnFile, Encoding.ASCII);
@@ -55,6 +67,7 @@ namespace sam_unpack_lib
             SubVersion = Encoding.ASCII.GetString(br.ReadBytes(0x3));
             end = FindEndMark(0);
             //Sections
+            Sections.Clear();
             for (int i = 0; i < sectionsCount; i++)
             {
                 section = new Section();
@@ -66,19 +79,35 @@ namespace sam_unpack_lib
                 section.Name = Encoding.ASCII.GetString(br.ReadBytes(0x3));
                 //Files
                 fileRecordOffset = start + 0x20;
-                curFilePointer = end;
+                curFilePointer = end + 4;
                 for (int f = 0; f < filesCount; f++)
                 {
                     mbnFile.Position = fileRecordOffset;
-                    section.Files[f].Offset = (UInt32)fileRecordOffset;
+                    section.Files[f].Offset = (UInt32)curFilePointer;
                     section.Files[f].Length = br.ReadUInt32();
                     mbnFile.Position += 0x08;
-                    fileName = Encoding.ASCII.GetString(br.ReadBytes(0x40).TakeWhile(x => x != 0x00).ToArray());
+                    section.Files[f].Name = Encoding.ASCII.GetString(br.ReadBytes(0x40).TakeWhile(x => x != 0x00).ToArray());
                     curFilePointer += section.Files[f].Length;
                     fileRecordOffset += 0x50;
                 }
                 Sections.Add(section);
             }
+        }
+
+        public void ExtractSection(MBN.Section section, string folder)
+        {
+            Directory.CreateDirectory(Path.Combine(folder, section.Name));
+            foreach (MBN.File file in section.Files)
+            {
+                ExtractFile(file, Path.Combine(folder, section.Name));
+            }
+        }
+
+        public void ExtractFile(MBN.File file, string folder)
+        {
+            FileStream destFile = new FileStream(Path.Combine(folder, file.Name), FileMode.Create);
+            FileIO.StreamCopy(mbnFile, destFile, file.Offset, file.Length);
+            destFile.Close();
         }
 
         private long FindStartMark(long start)
