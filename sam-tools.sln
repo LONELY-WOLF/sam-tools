@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smd-tool", "smd-tool\smd-tool.csproj", "{048D823A-BDB6-47B3-BAC3-AF73D81850DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mbn-tool", "mbn-tool\mbn-tool.csproj", "{ADF48A12-8D15-41FF-8856-F4FF6CC19ADC}"
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileLib", "FileLib\FileLib.csproj", "{51200616-E8A2-4617-B79D-D697FD809192}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sam-unpack-lib", "sam-unpack-lib\sam-unpack-lib.csproj", "{F99C8C52-176F-4FE5-9425-CF32B9C1647F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{245D33B0-5827-4F8C-A519-289413D2CA7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,16 @@ Global
 		{F99C8C52-176F-4FE5-9425-CF32B9C1647F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F99C8C52-176F-4FE5-9425-CF32B9C1647F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F99C8C52-176F-4FE5-9425-CF32B9C1647F}.Release|x86.ActiveCfg = Release|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{245D33B0-5827-4F8C-A519-289413D2CA7C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
