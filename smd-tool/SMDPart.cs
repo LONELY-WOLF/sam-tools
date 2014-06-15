@@ -36,16 +36,16 @@ namespace smd_tool
                     FileStream outFile = File.Open(Path.Combine(path, Name + ".bin"), FileMode.Create);
                     byte[] buffer = new byte[1024 * 1024];
                     smd.Position = FileOffset;
-                    int count;
+                    long count;
                     while (true)
                     {
-                        count = (int)(FileOffset + FileLenth - smd.Position);
+                        count = (long)(FileOffset + FileLenth - smd.Position);
                         if (count == 0)
                         {
                             break;
                         }
                         if (count > buffer.Length) count = buffer.Length;
-                        int read = smd.Read(buffer, 0, count);
+                        int read = smd.Read(buffer, 0, (int)count);
                         if (read <= 0)
                         {
                             break;
