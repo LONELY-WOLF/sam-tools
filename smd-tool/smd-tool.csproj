@@ -47,6 +47,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SMDPart.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\sam-unpack-lib\sam-unpack-lib.csproj">
+      <Project>{f99c8c52-176f-4fe5-9425-cf32b9c1647f}</Project>
+      <Name>sam-unpack-lib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -11,11 +11,10 @@ namespace test
     {
         static void Main(string[] args)
         {
-            MBN mbnFile = new MBN();
-            mbnFile.Load("1.mbn");
+            MBN mbnFile = new MBN("1.mbn");
             foreach (MBN.Section item in mbnFile.Sections)
             {
-                mbnFile.ExtractSection(item, "csc");
+                //item.Extract(item, "csc");
             }
         }
     }
