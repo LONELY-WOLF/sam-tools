@@ -51,6 +51,10 @@
       <Project>{51200616-E8A2-4617-B79D-D697FD809192}</Project>
       <Name>FileLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\sam-unpack-lib\sam-unpack-lib.csproj">
+      <Project>{f99c8c52-176f-4fe5-9425-cf32b9c1647f}</Project>
+      <Name>sam-unpack-lib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
