@@ -6,7 +6,7 @@ using System.IO;
 
 namespace smd_tool
 {
-    class SMDPart
+    /*class SMDPart
     {
         public UInt32 NandOffset, NandLenth, FileOffset, FileLenth, FSType, ID, IsPresentSignature;
         public string Name;
@@ -65,5 +65,5 @@ namespace smd_tool
                 return false;
             }
         }
-    }
+    }*/
 }
