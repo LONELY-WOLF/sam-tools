@@ -9,23 +9,31 @@ namespace sam_unpack_lib
 {
     public class MBN
     {
+        string fileName;
         public string Version, SubVersion;
         const UInt32 StartMark = 0x5955C5C1, EndMark = 0x5955C5C2;
         BinaryReader br;
         BinaryWriter bw;
         FileStream mbnFile;
-        public List<Section> Sections = new List<Section>();
+        public List<Section> Sections;
 
         static byte[] oSign = new byte[4] { 0xC1, 0xC5, 0x55, 0x59 }, cSign = new byte[4] { 0xC2, 0xC5, 0x55, 0x59 };
-        
+        private string p;
 
-        public struct File
+        public class File
         {
             public string Name;
             public UInt32 Offset, Length, Checksum;
+
+            public void Extract(FileStream mbnFile, string folder)
+            {
+                FileStream destFile = new FileStream(Path.Combine(folder, Name), FileMode.Create);
+                FileIO.StreamCopy(mbnFile, destFile, Offset, Length);
+                destFile.Close();
+            }
         }
 
-        public struct Section
+        public class Section
         {
             public string Name;
             public UInt32 Offset, Length;
@@ -51,9 +59,18 @@ namespace sam_unpack_lib
                     return RetVal;
                 }
             }
+
+            public void Extract(FileStream mbnFile, string folder)
+            {
+                Directory.CreateDirectory(Path.Combine(folder, Name));
+                foreach (MBN.File file in Files)
+                {
+                    file.Extract(mbnFile, Path.Combine(folder, Name));
+                }
+            }
         }
 
-        public void Load(string fileName)
+        public MBN(string fileName)
         {
             Section section;
             UInt32 sectionsCount, filesCount;
@@ -63,11 +80,11 @@ namespace sam_unpack_lib
             mbnFile.Position = 4;
             sectionsCount = br.ReadUInt32();
             mbnFile.Position = 0x20;
-            Version= Encoding.ASCII.GetString(br.ReadBytes(0x10).TakeWhile(x => x != 0x00).ToArray());
+            Version = Encoding.ASCII.GetString(br.ReadBytes(0x10).TakeWhile(x => x != 0x00).ToArray());
             SubVersion = Encoding.ASCII.GetString(br.ReadBytes(0x3));
             end = FindEndMark(0);
             //Sections
-            Sections.Clear();
+            Sections = new List<Section>();
             for (int i = 0; i < sectionsCount; i++)
             {
                 section = new Section();
@@ -92,22 +109,105 @@ namespace sam_unpack_lib
                 }
                 Sections.Add(section);
             }
+            this.fileName = fileName;
         }
 
-        public void ExtractSection(MBN.Section section, string folder)
+        public void Extract(string folder)
         {
-            Directory.CreateDirectory(Path.Combine(folder, section.Name));
-            foreach (MBN.File file in section.Files)
+            foreach (Section section in Sections)
             {
-                ExtractFile(file, Path.Combine(folder, section.Name));
+                section.Extract(mbnFile, folder);
             }
         }
 
-        public void ExtractFile(MBN.File file, string folder)
+        public static bool Pack(string filename, string folder, string version, string subversion)
         {
-            FileStream destFile = new FileStream(Path.Combine(folder, file.Name), FileMode.Create);
-            FileIO.StreamCopy(mbnFile, destFile, file.Offset, file.Length);
-            destFile.Close();
+            if (Directory.Exists(folder))
+            {
+                int recordOffset, dataOffset, filesCount, i, sum;
+                FileStream mbnFile = new FileStream(filename, FileMode.Create);
+                FileStream inputFile;
+                BinaryWriter writer = new BinaryWriter(mbnFile, Encoding.ASCII);
+                writer.Write(0x5955C5C1);
+                writer.Write(Directory.GetDirectories(folder).Count());
+                FileIO.WriteZeroes(mbnFile, 8, 0x34, 0x34);
+                writer.Write(0x5955C5C2);
+                mbnFile.Position = 0x20;
+                writer.Write(Encoding.ASCII.GetBytes(version));
+                mbnFile.Position = 0x30;
+                writer.Write(Encoding.ASCII.GetBytes(subversion));
+                mbnFile.Position = 0x40;
+                foreach (string cscDir in Directory.GetDirectories(folder))
+                {
+                    if (Path.GetFileName(cscDir).Length == 3)
+                    {
+                        writer.Write(0x5955C5C1);
+                        recordOffset = (int)mbnFile.Position;
+                        FileIO.WriteZeroes(mbnFile, mbnFile.Position, 0x298, 0x298);
+                        writer.Write(0x5955C5C2);
+                        dataOffset = (int)mbnFile.Position;
+                        mbnFile.Position = recordOffset;
+                        filesCount = Directory.GetFiles(cscDir).Count();
+                        writer.Write(filesCount);
+                        writer.Write(Encoding.ASCII.GetBytes(Path.GetFileName(cscDir)));
+                        mbnFile.Position += 17;
+                        i = 1;
+                        foreach (string file in Directory.GetFiles(cscDir))
+                        {
+                            inputFile = new FileStream(file, FileMode.Open);
+                            switch (Path.GetExtension(file))
+                            {
+                                case ".ini":
+                                case ".reg":
+                                    {
+                                        writer.Write(0x0B);
+                                        break;
+                                    }
+                                case ".provxml":
+                                    {
+                                        writer.Write(0x1A);
+                                        break;
+                                    }
+                                case ".xml":
+                                    {
+                                        writer.Write(0x0F);
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        writer.Write(0x00);
+                                        break;
+                                    }
+                            }
+                            writer.Write((int)inputFile.Length);
+                            recordOffset = (int)mbnFile.Position;
+                            mbnFile.Position = dataOffset;
+                            FileIO.StreamCopy(inputFile, mbnFile, 0, inputFile.Length, out sum);
+                            dataOffset = (int)mbnFile.Position;
+                            mbnFile.Position = recordOffset;
+                            writer.Write(sum);
+                            writer.Write(i);
+                            recordOffset = (int)mbnFile.Position;
+                            writer.Write(Encoding.ASCII.GetBytes(Path.GetFileName(file)));
+                            mbnFile.Position = (recordOffset + 0x40);
+                            if (i != filesCount - 1)
+                            {
+                                i++;
+                            }
+                            else
+                            {
+                                i = 0;
+                            }
+                        }
+                        mbnFile.Position = dataOffset;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private long FindStartMark(long start)
