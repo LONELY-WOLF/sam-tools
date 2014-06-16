@@ -12,87 +12,73 @@ namespace mbn_tool
     {
         static void Main(string[] args)
         {
-            string folder = "";
-            if (args.Length > 1)
+            List<string> arguments = args.ToList();
+            string filename, folder;
+            int index = -2;
+            index = arguments.IndexOf("/info");
+            if (index > -1)
             {
-                try
+                filename = GetArg(args, "/info", "");
+                MBN mbn = new MBN(filename);
+                Console.WriteLine("Firmware version: " + mbn.Version);
+                Console.WriteLine("Firmware subversion: " + mbn.SubVersion);
+                Console.WriteLine("Sections count: " + mbn.Sections.Count.ToString());
+                //Sections
+                foreach (MBN.Section section in mbn.Sections)
                 {
-                    if (args.Length > 2)
+                    Console.WriteLine("Section name: " + section.Name);
+                    Console.WriteLine("Files count: " + section.Files.Count().ToString());
+                    //Files
+                    foreach (MBN.File file in section.Files)
                     {
-                        folder = args[2];
-                    }
-                    switch (args[0])
-                    {
-                        case "/u":
-                            {
-                                MBN mbn = new MBN(args[1]);
-                                mbn.Extract(folder);
-                                break;
-                            }
-                        case "/p":
-                            {
-                                string filename;
-                                if (args.Count() > 2)
-                                {
-                                    filename = args[2];
-                                }
-                                else
-                                {
-                                    filename = Path.GetFileName(args[1]) + ".mbn";
-                                }
-                                if (!MBN.Pack(filename, args[1], "I8750OXXCMK2", "OXX"))
-                                {
-                                    PrintError("No such directory");
-                                }
-                                break;
-                            }
-                        case "/h":
-                            {
-                                MBN mbn = new MBN(args[1]);
-                                Console.WriteLine("Firmware version: " + mbn.Version);
-                                Console.WriteLine("Firmware subversion: " + mbn.SubVersion);
-                                Console.WriteLine("Sections count: " + mbn.Sections.Count.ToString());
-                                //Sections
-                                foreach (MBN.Section section in mbn.Sections)
-                                {
-                                    Console.WriteLine("Section name: " + section.Name);
-                                    Console.WriteLine("Files count: " + section.Files.Count().ToString());
-                                    //Files
-                                    foreach(MBN.File file in section.Files)
-                                    {
-                                        Console.WriteLine("File: " + file.Name);
-                                        Console.WriteLine("Length: " + file.Length.ToString());
-                                    }
-                                }
-                                break;
-                            }
+                        Console.WriteLine("File: " + file.Name);
+                        Console.WriteLine("Length: " + file.Length.ToString());
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                return;
             }
-            else
+            index = arguments.IndexOf("/u");
+            if (index > -1)
             {
-                //usage
-                Console.WriteLine(@"
+                filename = GetArg(args, "/u", "");
+                folder = GetArg(args, "/d", "csc");
+                MBN mbn = new MBN(filename);
+                mbn.Extract(folder);
+                return;
+            }
+            index = arguments.IndexOf("/p");
+            if (index > -1)
+            {
+                string ver, subver;
+                folder = GetArg(args, "/p", "");
+                filename = GetArg(args, "/f", folder + ".mbn");
+                ver = GetArg(args, "/ver", "I8750OXXCMK2");
+                subver = GetArg(args, "/subver", "OXX");
+                index = arguments.IndexOf("/ver");
+                if (!MBN.Pack(filename, folder, ver, subver))
+                {
+                    PrintError("No such directory");
+                }
+                return;
+            }
+            //usage
+            Console.WriteLine(@"
 USAGE:
 
-smd-tool /u <file> [<path>]
+/u <file> [/d <path>]
     Unpack MBN file
+    Default <path> is .\csc
 
-smd-tool /p <path> [<file>]
+/p <path> [/f <file>] [/ver <version>] [/subver <subversion>]
     Pack files located at <path> into MBN file <file>
+    Default <file> value is <path>.mbn
+    Ex.: mbn-tool /p csc /f my.mbn /ver I8750OXXCMK2 /subver OXX
 
-smd-tool /h <file>
+/info <file>
     Parse header in <file> and display info
 
-Default <path> is current directory
-
-(c) -WOLF- 2013
+(c) -WOLF- 2013-2014
 ");
-            }
         }
 
         static void PrintError(string message)
@@ -100,6 +86,28 @@ Default <path> is current directory
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
             Console.ResetColor();
+        }
+
+        static string GetArg(string[] args, string name, string defaultValue)
+        {
+            int index = -2;
+            int count = args.Count();
+            for (int i = 0; i < count; i++)
+            {
+                if (args[i] == name)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if ((index + 1 == count) || (index < 0))
+            {
+                return defaultValue;
+            }
+            else
+            {
+                return args[index + 1];
+            }
         }
     }
 }
