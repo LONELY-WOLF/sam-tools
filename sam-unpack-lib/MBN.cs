@@ -13,12 +13,10 @@ namespace sam_unpack_lib
         public string Version, SubVersion;
         const UInt32 StartMark = 0x5955C5C1, EndMark = 0x5955C5C2;
         BinaryReader br;
-        BinaryWriter bw;
         FileStream mbnFile;
         public List<Section> Sections;
 
         static byte[] oSign = new byte[4] { 0xC1, 0xC5, 0x55, 0x59 }, cSign = new byte[4] { 0xC2, 0xC5, 0x55, 0x59 };
-        private string p;
 
         public class File
         {

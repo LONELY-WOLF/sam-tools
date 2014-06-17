@@ -36,7 +36,6 @@ namespace smd_tool
                                         }
                                     }
                                     if (dir == "") dir = Environment.CurrentDirectory;
-                                    //FileStream smd = File.OpenRead(args[1]);
                                     List<SMD.Section> sections = SMD.GetSections(args[1]);
                                     foreach (SMD.Section part in sections)
                                     {
@@ -68,14 +67,13 @@ namespace smd_tool
                                     return -1;
                                 }
                             }
-                            break;
+                            return 0;
                         }
                     case "/p":
                         {
                             //Pack
                             Console.WriteLine("Not implelemented yet");
                             return -1;
-                            break;
                         }
                     case "/h":
                         {
@@ -115,13 +113,12 @@ namespace smd_tool
                                     return -1;
                                 }
                             }
-                            break;
+                            return 0;
                         }
                     default:
                         {
                             PrintHelp();
                             return -1;
-                            break;
                         }
                 }
             }
