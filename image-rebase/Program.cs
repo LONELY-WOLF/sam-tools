@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using FileLib;
+using sam_unpack_lib;
 
 namespace image_rebase
 {
@@ -12,9 +13,7 @@ namespace image_rebase
         static int Main(string[] args)
         {
             string binFileName = null, imgFileName = null;
-            uint partCount = 0;
-            long headerPosition = 0x10, binFilePos = 8, imgFilePos, partSize, zeroSize;
-            long sectorSize = 512;
+            long binFilePos = 8, imgFilePos, partSize;
 
             binFileName = GetArg(args, "/u", null);
             if (binFileName != null)
@@ -31,37 +30,21 @@ namespace image_rebase
                         imgFileName = binFileName + ".img";
                     }
                 }
-                FileStream binFile = new FileStream(binFileName, FileMode.Open);
-                FileStream imgFile = new FileStream(imgFileName, FileMode.Create);
-                byte[] buffer = new byte[8];
-                binFile.Read(buffer, 0, 8);
-                if (BitConverter.ToUInt64(buffer, 0) != 0x7260EACCEACC9442)
-                {
-                    PrintError("File signature mismatch!");
-                    return -1;
-                }
-                binFile.Read(buffer, 0, 4);
-                partCount = BitConverter.ToUInt32(buffer, 0);
-                Console.WriteLine("Parts count: {0}", partCount);
+                DiscreteImage image = new DiscreteImage(binFileName);
+                Console.WriteLine("Parts count: {0}", image.Sections.Count);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("     №   From     To       Count");
                 Console.ResetColor();
-                for (int i = 0; i < partCount; i++)
+                int i = 0;
+                foreach (DiscreteImage.Section section in image.Sections)
                 {
-                    binFile.Position = headerPosition;
-                    binFile.Read(buffer, 0, 8);
-                    imgFilePos = BitConverter.ToUInt32(buffer, 0);
-                    partSize = BitConverter.ToUInt32(buffer, 4);
-                    Console.WriteLine("Part {0:d4} {1:X8} {2:X8} {3:X8}", i, binFilePos, imgFilePos, partSize);
-                    zeroSize = (imgFilePos * sectorSize) - imgFile.Position;
-                    if (zeroSize != 0)
-                    {
-                        FileIO.WriteZeroes(imgFile, imgFile.Position, zeroSize);
-                    }
-                    FileIO.StreamCopy(binFile, imgFile, binFilePos * sectorSize, partSize * sectorSize, 0x100000);
+                    imgFilePos = section.Position;
+                    partSize = section.Length;
+                    Console.WriteLine("Part {0:d3} {1:X8} {2:X8} {3:X8}", i, binFilePos, imgFilePos, partSize);
                     binFilePos += partSize;
-                    headerPosition += 8;
+                    i++;
                 }
+                image.Extract(imgFileName);
                 return 0;
             }
             binFileName = GetArg(args, "/p", null);
@@ -73,31 +56,19 @@ namespace image_rebase
             binFileName = GetArg(args, "/info", null);
             if (binFileName != null)
             {
-                FileStream binFile = new FileStream(binFileName, FileMode.Open);
-                FileStream imgFile = new FileStream(imgFileName, FileMode.Create);
-                byte[] buffer = new byte[8];
-                binFile.Read(buffer, 0, 8);
-                if (BitConverter.ToUInt64(buffer, 0) != 0x7260EACCEACC9442)
-                {
-                    PrintError("File signature mismatch!");
-                    return -1;
-                }
-                binFile.Read(buffer, 0, 4);
-                partCount = BitConverter.ToUInt32(buffer, 0);
-                Console.WriteLine("Parts count: {0}", partCount);
+                DiscreteImage image = new DiscreteImage(binFileName);
+                Console.WriteLine("Parts count: {0}", image.Sections.Count);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("     №   From     To       Count");
                 Console.ResetColor();
-                for (int i = 0; i < partCount; i++)
+                int i = 0;
+                foreach(DiscreteImage.Section section in image.Sections)
                 {
-                    binFile.Position = headerPosition;
-                    binFile.Read(buffer, 0, 8);
-                    imgFilePos = BitConverter.ToUInt32(buffer, 0);
-                    partSize = BitConverter.ToUInt32(buffer, 4);
+                    imgFilePos = section.Position;
+                    partSize = section.Length;
                     Console.WriteLine("Part {0:d3} {1:X8} {2:X8} {3:X8}", i, binFilePos, imgFilePos, partSize);
-                    zeroSize = (imgFilePos * sectorSize) - imgFile.Position;
                     binFilePos += partSize;
-                    headerPosition += 8;
+                    i++;
                 }
                 return 0;
             }
