@@ -14,7 +14,7 @@ namespace sam_unpack_lib
             public uint FileOffset, FileLength, ROMOffset, ROMLength, ID, FS, IsPresentSignature;
             public byte[] MD5;
 
-            public string FName
+            /*public string FName
             {
                 get
                 {
@@ -33,13 +33,17 @@ namespace sam_unpack_lib
                             "\nPartition ID: 0x" + ID.ToString("X8") +
                             "\nAttributes: 0x" + FS.ToString("X8");
                 }
-            }
+            }*/
 
             public bool Extract(string fileName, string path)
             {
                 if ((this.IsPresentSignature == 0x1F1F1F1F) & (this.FileOffset != 0) & (this.FileLength != 0))
                 {
-                    FileStream smd = new FileStream(fileName, FileMode.Open);
+                    FileStream smd = File.OpenRead(fileName);
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
                     FileStream outFile = File.Open(Path.Combine(path, this.Name + ".bin"), FileMode.Create);
                     byte[] buffer = new byte[1024 * 1024];
                     smd.Position = this.FileOffset;
@@ -60,6 +64,7 @@ namespace sam_unpack_lib
                         outFile.Write(buffer, 0, read);
                     }
                     outFile.Close();
+                    smd.Close();
                     return true;
                 }
                 else
@@ -102,6 +107,7 @@ namespace sam_unpack_lib
                 }
                 offset += 0x40;
             }
+            smd.Close();
             return sections;
         }
 

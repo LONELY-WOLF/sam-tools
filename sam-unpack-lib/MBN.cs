@@ -73,7 +73,7 @@ namespace sam_unpack_lib
             Section section;
             UInt32 sectionsCount, filesCount;
             long start, end, fileRecordOffset, curFilePointer;
-            mbnFile = System.IO.File.Open(fileName, FileMode.Open, FileAccess.Read);
+            mbnFile = System.IO.File.OpenRead(fileName);
             br = new BinaryReader(mbnFile, Encoding.ASCII);
             mbnFile.Position = 4;
             sectionsCount = br.ReadUInt32();
@@ -97,6 +97,7 @@ namespace sam_unpack_lib
                 curFilePointer = end + 4;
                 for (int f = 0; f < filesCount; f++)
                 {
+                    section.Files[f] = new MBN.File();
                     mbnFile.Position = fileRecordOffset;
                     section.Files[f].Offset = (UInt32)curFilePointer;
                     section.Files[f].Length = br.ReadUInt32();

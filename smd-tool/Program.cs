@@ -26,6 +26,7 @@ namespace smd_tool
                     List<SMD.Section> sections = SMD.GetSections(filename);
                     foreach (SMD.Section part in sections)
                     {
+                        Console.Write(part.Name.PadRight(17));
                         Console.Write("{0:X8} {1:X8} {2:X8} {3:X8} ", part.ROMOffset, part.ROMLength, part.FileOffset, part.FileLength);
                         Console.Write("{0:X8} {1:X8} [      ]", part.ID, part.FS);
                         if (part.Extract(filename, dir))
@@ -69,6 +70,7 @@ namespace smd_tool
                     List<SMD.Section> sections = SMD.GetSections(filename);
                     foreach (SMD.Section part in sections)
                     {
+                        Console.Write(part.Name.PadRight(17));
                         Console.Write("{0:X8} {1:X8} {2:X8} {3:X8} ", part.ROMOffset, part.ROMLength, part.FileOffset, part.FileLength);
                         Console.Write("{0:X8} {1:X8} [      ]", part.ID, part.FS);
                         if ((part.IsPresentSignature == 0x1F1F1F1F) & (part.FileOffset != 0) & (part.FileLength != 0))
