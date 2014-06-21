@@ -47,6 +47,7 @@ namespace sam_unpack_lib
                 headerPosition += 8;
                 Sections.Add(new Section(imgFilePos, partSize));
             }
+            binFile.Close();
         }
 
         public void Extract(string imgFileName)
@@ -74,6 +75,7 @@ namespace sam_unpack_lib
                 FileIO.StreamCopy(binFile, imgFile, binFilePos * sectorSize, partSize * sectorSize, 0x100000);
                 binFilePos += partSize;
             }
+            binFile.Close();
         }
     }
 }
