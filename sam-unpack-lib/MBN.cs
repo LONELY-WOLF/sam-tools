@@ -197,10 +197,13 @@ namespace sam_unpack_lib
                             {
                                 i = 0;
                             }
+                            inputFile.Close();
                         }
                         mbnFile.Position = dataOffset;
                     }
                 }
+                writer.Close();
+                mbnFile.Close();
                 return true;
             }
             else
