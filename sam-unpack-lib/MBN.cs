@@ -212,6 +212,14 @@ namespace sam_unpack_lib
             }
         }
 
+        ~MBN()
+        {
+            if(mbnFile != null)
+            {
+                mbnFile.Close();
+            }
+        }
+
         private long FindStartMark(long start)
         {
             return FileIO.FileSearch(mbnFile, oSign, start);
