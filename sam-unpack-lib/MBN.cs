@@ -128,10 +128,10 @@ namespace sam_unpack_lib
                 FileStream mbnFile = new FileStream(filename, FileMode.Create);
                 FileStream inputFile;
                 BinaryWriter writer = new BinaryWriter(mbnFile, Encoding.ASCII);
-                writer.Write(0x5955C5C1);
+                writer.Write(StartMark);
                 writer.Write(Directory.GetDirectories(folder).Count());
                 FileIO.WriteZeroes(mbnFile, 8, 0x34, 0x34);
-                writer.Write(0x5955C5C2);
+                writer.Write(EndMark);
                 mbnFile.Position = 0x20;
                 writer.Write(Encoding.ASCII.GetBytes(version));
                 mbnFile.Position = 0x30;
@@ -141,10 +141,10 @@ namespace sam_unpack_lib
                 {
                     if (Path.GetFileName(cscDir).Length == 3)
                     {
-                        writer.Write(0x5955C5C1);
+                        writer.Write(StartMark);
                         recordOffset = (int)mbnFile.Position;
                         FileIO.WriteZeroes(mbnFile, mbnFile.Position, 0x298, 0x298);
-                        writer.Write(0x5955C5C2);
+                        writer.Write(EndMark);
                         dataOffset = (int)mbnFile.Position;
                         mbnFile.Position = recordOffset;
                         filesCount = Directory.GetFiles(cscDir).Count();
