@@ -13,7 +13,6 @@ namespace sam_unpack_lib
         public string Version, SubVersion;
         const UInt32 StartMark = 0x5955C5C1, EndMark = 0x5955C5C2;
         BinaryReader br;
-        FileStream mbnFile;
         public List<Section> Sections;
 
         static byte[] oSign = new byte[4] { 0xC1, 0xC5, 0x55, 0x59 }, cSign = new byte[4] { 0xC2, 0xC5, 0x55, 0x59 };
@@ -73,21 +72,21 @@ namespace sam_unpack_lib
             Section section;
             UInt32 sectionsCount, filesCount;
             long start, end, fileRecordOffset, curFilePointer;
-            mbnFile = System.IO.File.OpenRead(fileName);
+            FileStream mbnFile = System.IO.File.OpenRead(fileName);
             br = new BinaryReader(mbnFile, Encoding.ASCII);
             mbnFile.Position = 4;
             sectionsCount = br.ReadUInt32();
             mbnFile.Position = 0x20;
             Version = Encoding.ASCII.GetString(br.ReadBytes(0x10).TakeWhile(x => x != 0x00).ToArray());
             SubVersion = Encoding.ASCII.GetString(br.ReadBytes(0x3));
-            end = FindEndMark(0);
+            end = FindEndMark(mbnFile, 0);
             //Sections
             Sections = new List<Section>();
             for (int i = 0; i < sectionsCount; i++)
             {
                 section = new Section();
-                start = FindStartMark(end);
-                end = FindEndMark(start + 4);
+                start = FindStartMark(mbnFile, end);
+                end = FindEndMark(mbnFile, start + 4);
                 mbnFile.Position = start + 4;
                 filesCount = br.ReadUInt32();
                 section.Files = new File[filesCount];
@@ -108,11 +107,13 @@ namespace sam_unpack_lib
                 }
                 Sections.Add(section);
             }
+            mbnFile.Close();
             this.fileName = fileName;
         }
 
         public void Extract(string folder)
         {
+            FileStream mbnFile = System.IO.File.OpenRead(fileName);
             foreach (Section section in Sections)
             {
                 section.Extract(mbnFile, folder);
@@ -212,20 +213,12 @@ namespace sam_unpack_lib
             }
         }
 
-        ~MBN()
-        {
-            if(mbnFile != null)
-            {
-                mbnFile.Close();
-            }
-        }
-
-        private long FindStartMark(long start)
+        private long FindStartMark(FileStream mbnFile, long start)
         {
             return FileIO.FileSearch(mbnFile, oSign, start);
         }
 
-        private long FindEndMark(long start)
+        private long FindEndMark(FileStream mbnFile, long start)
         {
             return FileIO.FileSearch(mbnFile, cSign, start);
         }
