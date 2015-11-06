@@ -68,6 +68,9 @@ namespace smd_tool
                 if (File.Exists(filename))
                 {
                     List<SMD.Section> sections = SMD.GetSections(filename);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("Partition name   NAND off N size   ROM off  R size   Part. ID Type     Status");
+                    Console.ResetColor();
                     foreach (SMD.Section part in sections)
                     {
                         Console.Write(part.Name.PadRight(17));
