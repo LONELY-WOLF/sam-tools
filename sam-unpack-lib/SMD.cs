@@ -86,6 +86,7 @@ namespace sam_unpack_lib
             {
                 part = new Section();
                 part.Name = Encoding.ASCII.GetString(buffer, offset, 0x10).TrimEnd(new char[] { '\0' });
+                part.Name = part.Name.Replace('\0', ' ');
                 part.ROMOffset = BitConverter.ToUInt32(buffer, offset + 0x10);
                 part.ROMLength = BitConverter.ToUInt32(buffer, offset + 0x14);
                 part.FileOffset = BitConverter.ToUInt32(buffer, offset + 0x18);
