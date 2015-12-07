@@ -145,6 +145,8 @@ namespace sam_unpack_lib
                     }
                 }
             }
+            outFile.Close();
+            sections.Add(new Section(start, zStart - start, output + String.Format(".{0:d3}", fileNum)));
             return sections;
         }
 
