@@ -28,12 +28,12 @@ namespace smd_tool
                     {
                         Console.Write(part.Name.PadRight(17));
                         Console.Write("{0:X8} {1:X8} {2:X8} {3:X8} ", part.ROMOffset, part.ROMLength, part.FileOffset, part.FileLength);
-                        Console.Write("{0:X8} {1:X8} [      ]", part.ID, part.FS);
+                        Console.Write("{0:X8} {1:X8} [ .... ]", part.ID, part.FS);
                         if (part.Extract(filename, dir))
                         {
-                            Console.CursorLeft -= 5;
+                            Console.CursorLeft -= 7;
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write("OK");
+                            Console.Write("  OK  ");
                             Console.ResetColor();
                             Console.CursorLeft += 3;
                         }
@@ -75,12 +75,12 @@ namespace smd_tool
                     {
                         Console.Write(part.Name.PadRight(17));
                         Console.Write("{0:X8} {1:X8} {2:X8} {3:X8} ", part.ROMOffset, part.ROMLength, part.FileOffset, part.FileLength);
-                        Console.Write("{0:X8} {1:X8} [      ]", part.ID, part.FS);
+                        Console.Write("{0:X8} {1:X8} [ .... ]", part.ID, part.FS);
                         if ((part.IsPresentSignature == 0x1F1F1F1F) & (part.FileOffset != 0) & (part.FileLength != 0))
                         {
-                            Console.CursorLeft -= 5;
+                            Console.CursorLeft -= 7;
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write("OK");
+                            Console.Write("  OK  ");
                             Console.ResetColor();
                             Console.CursorLeft += 3;
                         }
