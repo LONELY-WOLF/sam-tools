@@ -162,16 +162,28 @@ namespace sam_unpack_lib
             {
                 throw new Exception("Invalid template file");
             }
+            BinaryWriter bw = new BinaryWriter(output);
+            //Write header
+            bw.Write(0x7260EACCEACC9442);
+            bw.Write(slist.Elements(XName.Get("section")).Count());
+            bw.Write(0);
             foreach (XElement section in slist.Elements(XName.Get("section")))
             {
-                input = new FileStream(section.Attribute(XName.Get("file")).Value, FileMode.Open);
                 long start = long.Parse(section.Attribute(XName.Get("start")).Value);
                 long length = long.Parse(section.Attribute(XName.Get("length")).Value);
                 if ((start % 512 != 0) || (length % 512 != 0))
                 {
                     throw new Exception("Incomplete sector");
                 }
-                FileIO.WriteZeroes(output, output.Position, start - output.Position);
+                bw.Write((int)(start / 512L));
+                bw.Write((int)(length / 512L));
+            }
+            FileIO.WriteZeroes(output, output.Position, 0x1000 - output.Position, 0x1000);
+            //Write payload
+            foreach (XElement section in slist.Elements(XName.Get("section")))
+            {
+                input = new FileStream(section.Attribute(XName.Get("file")).Value, FileMode.Open);
+                long length = long.Parse(section.Attribute(XName.Get("length")).Value);
                 FileIO.StreamCopy(input, output, 0, length, 1024 * 1024);
                 input.Close();
             }
