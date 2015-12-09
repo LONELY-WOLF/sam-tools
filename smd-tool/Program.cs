@@ -35,7 +35,7 @@ namespace smd_tool
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.Write("  OK  ");
                             Console.ResetColor();
-                            Console.CursorLeft += 3;
+                            Console.CursorLeft += 1;
                         }
                         else
                         {
@@ -82,7 +82,7 @@ namespace smd_tool
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.Write("  OK  ");
                             Console.ResetColor();
-                            Console.CursorLeft += 3;
+                            Console.CursorLeft += 1;
                         }
                         else
                         {
@@ -123,7 +123,7 @@ smd-tool /info <file>
 
 Default <path> is current directory
 
-(c) -WOLF- 2013-2014
+(c) -WOLF- 2013-2015
 ");
         }
 
