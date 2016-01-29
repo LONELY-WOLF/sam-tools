@@ -190,5 +190,11 @@ namespace sam_unpack_lib
                 input.Close();
             }
         }
+
+        public static Section SectionFromFile(string filename)
+        {
+            FileInfo fi = new FileInfo(filename);
+            return new Section(0, fi.Length, filename);
+        }
     }
 }

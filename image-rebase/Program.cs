@@ -81,6 +81,21 @@ namespace image_rebase
                     return -1;
                 }
             }
+            binFileName = GetArg(args, "/pseudo", null);
+            if (binFileName != null)
+            {
+                DiscreteImage.Section sect = DiscreteImage.SectionFromFile(binFileName);
+                StreamWriter template = new StreamWriter(binFileName + ".xml", false);
+                template.WriteLine("<image-rebase>");
+                template.WriteLine("\t<template>");
+                Console.WriteLine("Sliced to:");
+                Console.WriteLine("{0:X8} {1:X8} {2}", sect.Position, sect.Length, sect.File);
+                template.WriteLine("\t\t<section start=\"{0}\" length=\"{1}\" file=\"{2}\"/>", sect.Position, sect.Length, sect.File);
+                template.WriteLine("\t</template>");
+                template.WriteLine("</image-rebase>");
+                template.Close();
+                return 0;
+            }
             binFileName = GetArg(args, "/info", null);
             if (binFileName != null)
             {
@@ -126,10 +141,13 @@ image-rebase /s <input file> /z <length>
 image-rebase /p <output file> /t <template file>
     Pack image <output file> using <template file> as a recipe
 
+image-rebase /pseudo <input file>
+    Make template file for entire <input file>
+
 image-rebase /info <file>
     Parse header in <file> and display info
 
-(c) -WOLF- 2013-2015");
+(c) -WOLF- 2013-2016");
         }
 
         static string GetArg(string[] args, string name, string defaultValue)
