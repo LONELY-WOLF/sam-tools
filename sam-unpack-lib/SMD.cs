@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Xml.Linq;
 using FileLib;
+using System.Security.Cryptography;
 
 namespace sam_unpack_lib
 {
@@ -173,7 +174,7 @@ namespace sam_unpack_lib
 
         public static void Pack(string smdFile, string templateFile)
         {
-            FileStream output = new FileStream(smdFile, FileMode.Create);
+            FileStream output = new FileStream(smdFile, FileMode.Create, FileAccess.ReadWrite);
             FileStream input;
             XDocument template = XDocument.Load(templateFile);
             if (template.Root.Name != "smd-tool")
@@ -258,6 +259,11 @@ namespace sam_unpack_lib
                 input.Close();
             }
             //Compute MD5
+            output.Position = 0;
+            MD5 hash = MD5.Create();
+            hash.ComputeHash(output);
+            output.Position = 0x50;
+            bw.Write(hash.Hash);
         }
     }
 }
