@@ -1,0 +1,20 @@
+<smd-tool>
+	<template>
+		<header file="dump\header.bin"/>
+		<section name="GPT" file="dump\GPT.bin" offset="0"/>
+		<section name="SECURE" file="dump\SECURE.bin" offset="0x800"/>
+		<section name="DPP" file="dump\DPP.bin" offset="0x1000"/>
+		<section name="SBL1" file="dump\SBL1.bin" offset="0x8000"/>
+		<section name="SBL2" file="dump\SBL2.bin" offset="0x9000"/>
+		<section name="SBL3" file="dump\SBL3.bin" offset="0xA000"/>
+		<section name="UEFI" file="dump\UEFI.bin" offset="0xB000"/>
+		<section name="RPM" file="dump\RPM.bin" offset="0xD000"/>
+		<section name="TZ" file="dump\TZ.bin" offset="0xE000"/>
+		<section name="WINSECAPP" file="dump\WINSECAPP.bin" offset="0xF000"/>
+		<section name="PLAT" file="dump\PLAT.bin" offset="0x1A000"/>
+		<section name="EFIESP" file="dump\EFIESP.bin" offset="0x20000"/>
+		<section name="MMOS" file="dump\MMOS.bin" offset="0x46000"/>
+		<section name="MainOS" file="dump\MainOS.bin" offset="0x6C000"/>
+		<section name="Data" file="dump\Data.bin" offset="0x520000"/>
+	</template>
+</smd-tool>

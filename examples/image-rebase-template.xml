@@ -1,0 +1,9 @@
+<image-rebase>
+	<template>
+		<section start="0" length="676352" file=".\PLAT.img.000"/>
+		<section start="1826304" length="464896" file=".\PLAT.img.001"/>
+		<section start="3382784" length="60416" file=".\PLAT.img.002"/>
+		<section start="4911616" length="155136" file=".\PLAT.img.003"/>
+		<section start="6149632" length="1439744" file=".\PLAT.img.004"/>
+	</template>
+</image-rebase>
