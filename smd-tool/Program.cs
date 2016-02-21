@@ -120,15 +120,15 @@ USAGE:
 smd-tool /u <file> [/d <path>]
     Unpack SMD file
 
-smd-tool /p <file> /d <path>
-    Pack partitions located at <path> into SMD file <file>
+smd-tool /p <file> /t <template>
+    Pack partitions into SMD <file> using <template>
 
 smd-tool /info <file>
     Parse header in <file> and display info
 
 Default <path> is current directory
 
-(c) -WOLF- 2013-2015
+(c) -WOLF- 2013-2016
 ");
         }
 
