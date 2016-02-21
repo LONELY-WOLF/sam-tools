@@ -24,6 +24,9 @@ namespace smd_tool
                         PrintError("Directory not found!");
                     }
                     List<SMD.Section> sections = SMD.GetSections(filename);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("Partition name   NAND off N size   ROM off  R size   Part. ID Type     Status");
+                    Console.ResetColor();
                     foreach (SMD.Section part in sections)
                     {
                         Console.Write(part.Name.PadRight(17));
@@ -58,7 +61,9 @@ namespace smd_tool
             if (HasFlag(args, "/p"))
             {
                 //Pack
-                Console.WriteLine("Not implelemented yet");
+                filename = GetArg(args, "/p", null);
+                string template = GetArg(args, "/t", null);
+                SMD.Pack(filename, template);
                 return -1;
             }
             if (HasFlag(args, "/info"))
@@ -76,7 +81,7 @@ namespace smd_tool
                         Console.Write(part.Name.PadRight(17));
                         Console.Write("{0:X8} {1:X8} {2:X8} {3:X8} ", part.ROMOffset, part.ROMLength, part.FileOffset, part.FileLength);
                         Console.Write("{0:X8} {1:X8} [ .... ]", part.ID, part.FS);
-                        if ((part.IsPresentSignature == 0x1F1F1F1F) & (part.FileOffset != 0) & (part.FileLength != 0))
+                        if ((part.IsPresent) & (part.FileOffset != 0) & (part.FileLength != 0))
                         {
                             Console.CursorLeft -= 7;
                             Console.ForegroundColor = ConsoleColor.Green;

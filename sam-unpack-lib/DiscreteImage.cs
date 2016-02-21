@@ -10,6 +10,9 @@ namespace sam_unpack_lib
 {
     public class DiscreteImage
     {
+        public const int HEADER_SIZE = 0x1000;
+        public const ulong IS_PACKED_SIGNATURE = 0x7260EACCEACC9442u;
+
         public class Section
         {
             public long Position, Length;
@@ -31,6 +34,14 @@ namespace sam_unpack_lib
         }
 
         public List<DiscreteImage.Section> Sections;
+        public long RealSize
+        {
+            get
+            {
+                Section last = Sections.Last();
+                return (last.Position + last.Length) * 512L;
+            }
+        }
         string binFileName;
 
         public DiscreteImage(string fileName)
@@ -39,7 +50,7 @@ namespace sam_unpack_lib
             uint partCount = 0;
             long headerPosition = 0x10, imgFilePos, partSize;
             Sections = new List<Section>();
-            FileStream binFile = new FileStream(fileName, FileMode.Open);
+            FileStream binFile = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             byte[] buffer = new byte[8];
             binFile.Read(buffer, 0, 8);
             if (BitConverter.ToUInt64(buffer, 0) != 0x7260EACCEACC9442)
@@ -180,7 +191,7 @@ namespace sam_unpack_lib
                 bw.Write((int)(start / 512L));
                 bw.Write((int)(length / 512L));
             }
-            FileIO.WriteZeroes(output, output.Position, 0x1000 - output.Position, 0x1000);
+            FileIO.WriteZeroes(output, output.Position, HEADER_SIZE - output.Position, HEADER_SIZE);
             //Write payload
             foreach (XElement section in slist.Elements(XName.Get("section")))
             {

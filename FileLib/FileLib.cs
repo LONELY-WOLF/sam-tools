@@ -26,31 +26,39 @@ namespace FileLib
             return -1;
         }
 
-        public static void StreamCopy(Stream source, Stream dest, long start, long count, int bufferSize = 4096)
+        public static void StreamCopy(Stream source, Stream dest, long srcStart, long srcCount, int bufferSize = 4096)
         {
+            if(bufferSize > srcCount)
+            {
+                bufferSize = (int)srcCount;
+            }
             long counter = 0;
             int bytesRead, bytesToRead;
             byte[] buffer = new byte[bufferSize];
-            source.Seek(start, SeekOrigin.Begin);
-            while (counter < count)
+            source.Seek(srcStart, SeekOrigin.Begin);
+            while (counter < srcCount)
             {
-                bytesToRead = (int)((count - counter > bufferSize) ? bufferSize : count - counter);
+                bytesToRead = (int)((srcCount - counter > bufferSize) ? bufferSize : srcCount - counter);
                 bytesRead = source.Read(buffer, 0, bytesToRead);
                 dest.Write(buffer, 0, bytesRead);
                 counter += bytesRead;
             }
         }
 
-        public static void StreamCopy(Stream source, Stream dest, long start, long count, out int checksum, int bufferSize = 4096)
+        public static void StreamCopy(Stream source, Stream dest, long srcStart, long srcCount, out int checksum, int bufferSize = 4096)
         {
+            if (bufferSize > srcCount)
+            {
+                bufferSize = (int)srcCount;
+            }
             int sum = 0;
             long counter = 0;
             int bytesRead, bytesToRead;
             byte[] buffer = new byte[bufferSize];
-            source.Seek(start, SeekOrigin.Begin);
-            while (counter < count)
+            source.Seek(srcStart, SeekOrigin.Begin);
+            while (counter < srcCount)
             {
-                bytesToRead = (int)((count - counter > bufferSize) ? bufferSize : count - counter);
+                bytesToRead = (int)((srcCount - counter > bufferSize) ? bufferSize : srcCount - counter);
                 bytesRead = source.Read(buffer, 0, bytesToRead);
                 dest.Write(buffer, 0, bytesRead);
                 sum += buffer.Take(bytesRead).Sum(x => x);
@@ -61,6 +69,10 @@ namespace FileLib
 
         public static void WriteZeroes(Stream dest, long start, long count, int bufferSize = 0x100000)
         {
+            if (bufferSize > count)
+            {
+                bufferSize = (int)count;
+            }
             long counter = 0;
             int bytesToWrite;
             byte[] buffer = new byte[bufferSize];
