@@ -252,7 +252,7 @@ namespace sam_unpack_lib
                     bw.Write(1u); //count
                     bw.Write(0u);
                     bw.Write(0u); //start
-                    bw.Write(sec.FileLength / 512);
+                    bw.Write((uint)input.Length / 512);
                     FileIO.WriteZeroes(output, sec.FileOffset + 24, DiscreteImage.HEADER_SIZE - 24);
                 }
                 FileIO.StreamCopy(input, output, 0, input.Length, 1024 * 1024);
